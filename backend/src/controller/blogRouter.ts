@@ -36,6 +36,7 @@ blog.use('/*', async (context, next) => {
         await next();
     }
     catch (e: any) {
+        context.status(403);
         return context.json({ success: false, msg: e.message });
     }
 })
@@ -68,6 +69,7 @@ blog.post('/', async (context) => {
     }
     catch (e: any) {
         if (e instanceof Error) {
+            context.status(422);
             return context.json({ success: false, msg: e.message });
         }
         return context.json({ success: false, msg: "unknow error occured" });
@@ -111,7 +113,11 @@ blog.put('/:id', async (context) => {
         return context.json({ success: true, msg: "blog updated", data: updateBlog.id });
     }
     catch (e: any) {
-        if (e instanceof Error) { return context.json({ success: false, msg: e.message }); }
+        if (e instanceof Error) { 
+            context.status(422);
+            return context.json({ success: false, msg: e.message }); 
+        }
+        context.status(503);
         return context.json({ success: false, msg: "unknow error occured" });
     }
 });
@@ -148,6 +154,7 @@ blog.get('/', async (context) => {
         return context.json({ success: true, msg: "all the blogs ", data: allBlogs });
     }
     catch (e: any) {
+
         if (e instanceof Error) { return context.json({ success: false, msg: e.message }); }
         return context.json({ success: false, msg: "unknow error occured" });
     }
