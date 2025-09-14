@@ -24,7 +24,12 @@ app.use('/api/v1/*', async (context, next) => {
   catch (e: any) {
     return context.json({ success: false, msg: e.message });
   }
-})
+});
+
+// app.onError((err, c) => {
+//   return c.json({ success: false, error: err.message }, 400);
+// });
+
 app.route('/api/v1/blog', blog);
 app.route('/api/v1/user', user);
 

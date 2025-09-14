@@ -7,13 +7,14 @@ const blog = new Hono<{
     },
     Variables: {
         prisma: any,
-        userId : string
+        userId: string
     }
 }>();
 
+// Authorization Middleware
 blog.use('/*', async (context, next) => {
     try {
-        const prisma  = context.get("prisma");
+        const prisma = context.get("prisma");
         const header = context.req.header('Authorization') || "";
         const token = header.startsWith('Bearer') ? header.split(" ")[1] : "";
         if (!token) {
@@ -31,7 +32,7 @@ blog.use('/*', async (context, next) => {
             const error = new Error("Authorization failed no user found");
             throw error;
         }
-        context.set("userId" , userExist.id);
+        context.set("userId", userExist.id);
         await next();
     }
     catch (e: any) {
@@ -39,40 +40,117 @@ blog.use('/*', async (context, next) => {
     }
 })
 
-// create a blog
+// Create a Blog
 blog.post('/', async (context) => {
-    const blogSchema = zod.object({
-        title : zod.string().min(1 , {message : "blog post's title should be minimum of 1 char"}),
-        content : zod.string().min(1,{message : "descripton's length is required"}),
-        published : zod.boolean().default(false),
-        authorId :zod.string()
-    });
-    const payload = await context.req.json();
-    const prisma = context.get("prisma");
-    const id = context.get("userId");
-    const createBlog = await prisma.blog.create({
-        data : {
-            title : payload.title,
-            content : payload.content,
-            userId : id
+    try {
+        const blogSchema = zod.object({
+            title: zod.string().min(1, { message: "blog post's title should be minimum of 1 char" }),
+            content: zod.string().min(1, { message: "descripton's length is required" }),
+            published: zod.boolean().default(false),
+        });
+        const payload = await context.req.json();
+        const response = blogSchema.safeParse(payload);
+        if (!response.success) {
+            console.log(response);
+            const error = new Error(response.error.issues[0].message);
+            throw error;
         }
-    })
-    return context.json({success : true , msg : "blog created ", data : createBlog.id});
+        const prisma = context.get("prisma");
+        const id = context.get("userId");
+        const createBlog = await prisma.blog.create({
+            data: {
+                title: payload.title,
+                content: payload.content,
+                userId: id
+            }
+        })
+        return context.json({ success: true, msg: "blog created ", data: createBlog.id });
+    }
+    catch (e: any) {
+        if (e instanceof Error) {
+            return context.json({ success: false, msg: e.message });
+        }
+        return context.json({ success: false, msg: "unknow error occured" });
+    }
 });
 
 
 // Update the blog
-blog.put('/:id', (context) => {
-    return context.text("blog page put api");
+blog.put('/:id', async (context) => {
+    try {
+        const updateBlogSchema = zod.object({
+            title: zod.string().min(1).optional(),
+            content: zod.string().min(1, { message: "descripton's length is required" }).optional(),
+            published: zod.boolean().optional()
+        })
+        const payload = await context.req.json();
+        const response = updateBlogSchema.safeParse(payload);
+        if (!response.success) {
+            const error = new Error(response.error.issues[0].message);
+            throw error;
+        }
+        const parsedPayload = response.data;
+        const id = context.req.param("id");
+        const prisma = context.get("prisma");
+        if (Object.keys(parsedPayload).length == 0) {
+            const error = new Error("empty inputs");
+            throw error;
+        }
+        console.log(id);
+        const updateBlog = await prisma.blog.update({
+            where: {
+                id,
+                userId:context.get("userId")
+            },
+            data: {
+                title: parsedPayload.title,
+                content: parsedPayload.content,
+                published: parsedPayload.published
+            }
+        })
+        return context.json({ success: true, msg: "blog updated", data: updateBlog.id });
+    }
+    catch (e: any) {
+        if (e instanceof Error) { return context.json({ success: false, msg: e.message }); }
+        return context.json({ success: false, msg: "unknow error occured" });
+    }
 });
 
 // get the blog
-blog.get('/:id', (context) => {
-    return context.text('Assalam Alaikum Hono!');
+blog.get('/:id', async (context) => {
+    try {
+        const prisma = context.get("prisma");
+        const id = context.req.param("id");
+        const getBlog = await prisma.blog.findUnique({
+            where: {
+                id
+            }
+        });
+        if (!getBlog) {
+            const error = new Error("no blog found with this id");
+            throw error;
+        }
+        return context.json({ success: true, msg: "your blog", data: getBlog });
+    }
+    catch (e: any) {
+        if (e instanceof Error) { return context.json({ success: false, msg: e.message }); }
+        return context.json({ success: false, msg: "unknow error occured" });
+    }
 });
 
-blog.get('/', (context) => {
-    return context.text("all the blogs should be returned from this api");
+blog.get('/', async (context) => {
+    try {
+        const prisma = context.get("prisma");
+        const allBlogs = await prisma.blog.findMany();
+        if (!allBlogs) {
+            const error = new Error("no blogs found");
+        }
+        return context.json({ success: true, msg: "all the blogs ", data: allBlogs });
+    }
+    catch (e: any) {
+        if (e instanceof Error) { return context.json({ success: false, msg: e.message }); }
+        return context.json({ success: false, msg: "unknow error occured" });
+    }
 });
 
 export default blog;
