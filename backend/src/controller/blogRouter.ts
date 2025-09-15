@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { verify } from 'hono/jwt';
-import * as zod from "zod";
+import { blogSchema } from '@adin.dev/common';
+import { updateBlogSchema } from '@adin.dev/common';
 const blog = new Hono<{
     Bindings: {
         SECRET: string
@@ -44,11 +45,6 @@ blog.use('/*', async (context, next) => {
 // Create a Blog
 blog.post('/', async (context) => {
     try {
-        const blogSchema = zod.object({
-            title: zod.string().min(1, { message: "blog post's title should be minimum of 1 char" }),
-            content: zod.string().min(1, { message: "descripton's length is required" }),
-            published: zod.boolean().default(false),
-        });
         const payload = await context.req.json();
         const response = blogSchema.safeParse(payload);
         if (!response.success) {
@@ -80,11 +76,6 @@ blog.post('/', async (context) => {
 // Update the blog
 blog.put('/:id', async (context) => {
     try {
-        const updateBlogSchema = zod.object({
-            title: zod.string().min(1).optional(),
-            content: zod.string().min(1, { message: "descripton's length is required" }).optional(),
-            published: zod.boolean().optional()
-        })
         const payload = await context.req.json();
         const response = updateBlogSchema.safeParse(payload);
         if (!response.success) {
@@ -99,23 +90,20 @@ blog.put('/:id', async (context) => {
             throw error;
         }
         console.log(id);
+        const userId = context.get("userId");
         const updateBlog = await prisma.blog.update({
             where: {
                 id,
-                userId:context.get("userId")
+                userId
             },
-            data: {
-                title: parsedPayload.title,
-                content: parsedPayload.content,
-                published: parsedPayload.published
-            }
-        })
+            data: parsedPayload
+        });
         return context.json({ success: true, msg: "blog updated", data: updateBlog.id });
     }
     catch (e: any) {
-        if (e instanceof Error) { 
+        if (e instanceof Error) {
             context.status(422);
-            return context.json({ success: false, msg: e.message }); 
+            return context.json({ success: false, msg: e.message });
         }
         context.status(503);
         return context.json({ success: false, msg: "unknow error occured" });

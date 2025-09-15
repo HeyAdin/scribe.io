@@ -1,9 +1,8 @@
 import { Hono } from 'hono';
 import bcrypt from 'bcryptjs';
 import { sign } from 'hono/jwt';
-import * as zod from 'zod';
-import { PrismaClient } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { signupSchema } from '@adin.dev/common';
+import { signinSchema } from '@adin.dev/common';
 const user = new Hono<{
     Bindings: {
         DATABASE_URL: string,
@@ -17,12 +16,6 @@ const user = new Hono<{
 user.post('/signup', async (context) => {
     try {
         const prisma = context.get("prisma");
-        const signupSchema = zod.object({
-            email: zod.email({ message: "invalid email please give the right inputs" }),
-            fname: zod.string().min(1, { message: "first name should be minimum 1 char" }),
-            lname: zod.string().min(1, { message: "last name should be minimum 1 char" }),
-            password: zod.string().min(6, { message: "password lenght required " }),
-        });
         const payload = await context.req.json();
         const response = signupSchema.safeParse(payload);
         if (!response.success) {
@@ -70,11 +63,6 @@ user.post('/signup', async (context) => {
 
 user.post('/signin', async (context) => {
     try {
-        const signinSchema = zod.object({
-            email: zod.email({ message: "invalid email please give the right inputs" }),
-            password: zod.string().min(6, { message: "password lenght required " }),
-        });
-
         const prisma = context.get("prisma");
         const payload = await context.req.json();
         const response = signinSchema.safeParse(payload);
