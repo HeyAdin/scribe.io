@@ -3,6 +3,7 @@ import user from './controller/userRouter';
 import blog from './controller/blogRouter';
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
+import { cors } from 'hono/cors'
 const app = new Hono<{
   Bindings: {
     DATABASE_URL: string,
@@ -11,7 +12,7 @@ const app = new Hono<{
     prisma: any
   }
 }>();
-
+app.use('/api/v1/*', cors())
 app.use('/api/v1/*', async (context, next) => {
   try {
     const prisma = new PrismaClient({
