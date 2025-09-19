@@ -119,15 +119,16 @@ blog.get('/:id', async (context) => {
             where: {
                 id
             },
-            select:{
-                title : true,
-                content : true,
-                user:{
-                    select : {
-                        fname : true,
-                        lname : true
+            select: {
+                title: true,
+                content: true,
+                user: {
+                    select: {
+                        fname: true,
+                        lname: true
                     }
-                }
+                },
+                createdAt: true
             }
         });
         if (!getBlog) {
@@ -146,16 +147,17 @@ blog.get('/', async (context) => {
     try {
         const prisma = context.get("prisma");
         const allBlogs = await prisma.blog.findMany({
-            select:{
-                id:true,
-                title : true,
-                content : true,
-                user : {
-                    select : {
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                user: {
+                    select: {
                         fname: true,
-                        lname : true,
+                        lname: true,
                     }
-                }
+                },
+                createdAt: true
             }
         });
         if (!allBlogs) {
