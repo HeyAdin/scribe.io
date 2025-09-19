@@ -173,12 +173,11 @@ blog.get('/', async (context) => {
 });
 
 // Likes a blog
-blog.patch('/like', async (c) => {
+blog.patch('/like/:id', async (c) => {
     try {
         const prisma = c.get("prisma");
         const userId = c.get("userId");
-        const body = await c.req.json();
-        const blogId = body.blogId 
+        const blogId = c.req.param("id");
         const likeExists = await prisma.blogLike.findUnique({
             where: {
                 blogId_userId: { blogId, userId }
@@ -200,6 +199,29 @@ blog.patch('/like', async (c) => {
 
         c.status(200);
         return c.json({ success: true, msg: "blog liked" });
+    }
+    catch (e: any) {
+        if (e instanceof Error) { return c.json({ success: false, msg: e.message }); }
+        return c.json({ success: false, msg: "unknow error occured" });
+    }
+})
+
+blog.get('/like/:id', async (c) => {
+    try {
+        const prisma = c.get("prisma");
+        const blogId = await c.req.param("id");
+        const response = await prisma.blogLike.findMany({
+            where :{
+                blogId  
+            }
+        })
+        const likeCount = response.length;
+        c.status(200);
+        return c.json({
+            success : true,
+            msg : "all like for this blog",
+            data : likeCount
+        })
     }
     catch (e: any) {
         if (e instanceof Error) { return c.json({ success: false, msg: e.message }); }
