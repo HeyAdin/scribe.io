@@ -1,10 +1,16 @@
 import { useBlogs } from "../hooks";
 import like from '../assets/like.png'
 import { useNavigate } from "react-router-dom";
+import { BlogCardSkeleton } from "./BlogCardSkeleton";
 export const DisplayBlogs = () => {
     const { blogs, loading, error } = useBlogs();
+    console.log(loading);
     if (loading) {
-        return <div className='flex justify-center items-center mt-40'>Loading.....</div>
+         return <div className="mt-10">
+            <BlogCardSkeleton/>
+            <BlogCardSkeleton/>
+            <BlogCardSkeleton/>
+    </div>
     }
     if (error) {
         console.log("error got ")
