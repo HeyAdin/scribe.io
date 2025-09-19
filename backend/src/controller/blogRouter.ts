@@ -172,4 +172,39 @@ blog.get('/', async (context) => {
     }
 });
 
+// Likes a blog
+blog.patch('/like', async (c) => {
+    try {
+        const prisma = c.get("prisma");
+        const userId = c.get("userId");
+        const body = await c.req.json();
+        const blogId = body.blogId 
+        const likeExists = await prisma.blogLike.findUnique({
+            where: {
+                blogId_userId: { blogId, userId }
+            }
+        })
+        if (likeExists) {
+            await prisma.blogLike.delete({
+                where: { blogId_userId: { blogId, userId } },
+            });
+            c.status(200);
+            return c.json({ success: true, msg: "blog unliked" })
+        }
+        await prisma.blogLike.create({
+            data: {
+                blogId,
+                userId
+            }
+        })
+
+        c.status(200);
+        return c.json({ success: true, msg: "blog liked" });
+    }
+    catch (e: any) {
+        if (e instanceof Error) { return c.json({ success: false, msg: e.message }); }
+        return c.json({ success: false, msg: "unknow error occured" });
+    }
+})
+
 export default blog;
