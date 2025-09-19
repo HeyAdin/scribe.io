@@ -118,6 +118,16 @@ blog.get('/:id', async (context) => {
         const getBlog = await prisma.blog.findUnique({
             where: {
                 id
+            },
+            select:{
+                title : true,
+                content : true,
+                user:{
+                    select : {
+                        fname : true,
+                        lname : true
+                    }
+                }
             }
         });
         if (!getBlog) {
@@ -135,7 +145,19 @@ blog.get('/:id', async (context) => {
 blog.get('/', async (context) => {
     try {
         const prisma = context.get("prisma");
-        const allBlogs = await prisma.blog.findMany();
+        const allBlogs = await prisma.blog.findMany({
+            select:{
+                id:true,
+                title : true,
+                content : true,
+                user : {
+                    select : {
+                        fname: true,
+                        lname : true,
+                    }
+                }
+            }
+        });
         if (!allBlogs) {
             const error = new Error("no blogs found");
         }
