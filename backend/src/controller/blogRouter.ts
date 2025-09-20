@@ -157,7 +157,12 @@ blog.get('/', async (context) => {
                         lname: true,
                     }
                 },
-                createdAt: true
+                createdAt: true,
+                _count : {
+                    select : {
+                        blogLikes : true
+                    }
+                }
             }
         });
         if (!allBlogs) {
@@ -209,7 +214,7 @@ blog.patch('/like/:id', async (c) => {
 blog.get('/like/:id', async (c) => {
     try {
         const prisma = c.get("prisma");
-        const blogId = await c.req.param("id");
+        const blogId = c.req.param("id");
         const response = await prisma.blogLike.findMany({
             where :{
                 blogId  
