@@ -36,8 +36,8 @@ export const BlogsDetail = () => {
     }
     const authorName = blog.user.fname + " " + blog.user.lname;
     const publishedDate = formatDate(blog.createdAt)
-    return <div className="flex mt-35 justify-center w-[80%] gap-8">
-        <div>
+    return <div className="flex mt-35 justify-center w-[80%] gap-8 ">
+        <div className="overflow-hidden h-[60%]  overflow-y-scroll [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mask-y-from-90%">
             <FullBlog title={blog.title} content={blog.content} publishedDate={publishedDate} id={id} clicked={clicked} setClicked={setClicked} liked={liked} setLiked={setLiked} />
         </div>
         <UserDescription authorName={authorName} />
@@ -79,7 +79,7 @@ function FullBlog({ id, title, content, publishedDate ,liked , setLiked , clicke
     };
 
 
-    return <div className=" w-full p-4 flex flex-col gap-4  ">
+    return <div className=" w-full p-4 py-10 flex flex-col gap-4 ">
         <div className="text-5xl w-[80%] cursor-pointer leading-15 font-semibold">{title}  </div>
         <div className="text-neutral-500 ">{`Posted on ${publishedDate}`}</div>
         <div className="text-2xl text-neutral-600 cursor-pointer tracking-wide leading-8">{content}</div>
