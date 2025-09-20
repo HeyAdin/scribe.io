@@ -3,7 +3,6 @@ import like from '../assets/like.png'
 import { useNavigate } from "react-router-dom";
 import { BlogCardSkeleton } from "./BlogCardSkeleton";
 import { formatDate } from "../../config";
-import { useState } from "react";
 export const DisplayBlogs = () => {
     const { blogs, loading, error } = useBlogs();
     console.log(loading);
@@ -21,7 +20,7 @@ export const DisplayBlogs = () => {
     return <div className="mb-15">
         {blogs.map((b, i) => {
             const publishedDate = formatDate(b.createdAt)
-            const authorName = b.user.fname + " " + b.user.lname;
+            const authorName = b.user ? `${b.user.fname} ${b.user.lname}` : "Unknown Author";
             const likeCount = b._count.blogLikes;
             return <BlogsCard key={i} authorName={authorName} title={b.title} content={b.content} publishedDate={publishedDate} id={b.id} likeCount={likeCount} />
         }
@@ -37,7 +36,7 @@ export const DisplayBlogs = () => {
 }
 interface BlogsCardInput {
     id?: string;
-    authorName: string;
+    authorName?: string;
     title: string;
     content: string;
     publishedDate: string;
@@ -48,7 +47,7 @@ export function BlogsCard({ authorName, title, content, publishedDate, id, likeC
     const navigate = useNavigate();
     return <div className="border-t w-full mt-4 p-4 flex flex-col gap-4">
         <div className="flex gap-5 items-center">
-            <div className="w-[30px] h-[30px] rounded-full border flex items-center justify-center text-xl font-black bg-gray-100">{authorName.slice(0, 1)}</div>
+            {authorName?<div className="w-[30px] h-[30px] rounded-full border flex items-center justify-center text-xl font-black bg-gray-100">{authorName? authorName.slice(0, 1):null}</div>:null}
             <div className="text-gray-800 text-xl font-bold">{authorName}</div>
             <div className="text-neutral-500 ">{publishedDate}</div>
         </div>
