@@ -10,8 +10,9 @@ interface BlogsType {
     id: string;
     title: string;
     content: string;
-    user: user
-    publishedDate: string
+    user: user;
+    createdAt: string;
+    _count : {blogLikes : number}
 }
 export const useBlogs = () => {
     const [blogs, setBlogs] = useState<BlogsType[]>([]);
@@ -56,12 +57,14 @@ export const useBlogs = () => {
 
 
 export const useBlogDetail = ({ id }: { id: string }) => {
+
     const [blog, setBlog] = useState<BlogsType>({
         id: "",
         title: "",
         content: "",
         user: { fname: "", lname: "" },
-        publishedDate: "2025-07-12"
+        createdAt: "",
+        _count : {blogLikes : 0}
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -86,7 +89,7 @@ export const useBlogDetail = ({ id }: { id: string }) => {
         })
             .then((response) => {
                 setBlog((b) => {
-                    return { ...b ,  ...response.data.data}
+                    return { ...b, ...response.data.data }
                 });
                 setLoading(false);
             })
