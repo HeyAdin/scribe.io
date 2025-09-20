@@ -1,5 +1,9 @@
+import { Navbar } from "../components/Navbar"
+import { ProfileDetail } from "../components/ProfileDetai"
+
 export const Profile = ()=>{
-    return <div>
-        Hello From the profile
-    </div>
+    return <div className="background h-screen flex flex-col items-center ">
+            <Navbar />
+            <ProfileDetail />
+        </div>
 }
