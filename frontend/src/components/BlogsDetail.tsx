@@ -1,9 +1,26 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useBlogDetail } from "../hooks"
 import like from '../assets/like.png'
+import { BACKEND_URL, formatDate } from "../../config";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export const BlogsDetail = () => {
     const { id } = useParams();
+    const [clicked, setClicked] = useState(false);
+    const [liked, setLiked] = useState(0);
+    useEffect(() => {
+        axios.get(`${BACKEND_URL}api/v1/blog/like/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        })
+            .then((response) => {
+                if (response.data.success) {
+                    setLiked(response.data.data);
+                }
+            });
+    }, [liked]);
     const { blog, loading, error } = useBlogDetail({ id: id || "" });
     if (error) {
         console.log("error got ")
@@ -18,9 +35,10 @@ export const BlogsDetail = () => {
         );
     }
     const authorName = blog.user.fname + " " + blog.user.lname;
+    const publishedDate = formatDate(blog.createdAt)
     return <div className="flex mt-35 justify-center w-[80%] gap-8">
-        <div className="">
-            <FullBlog title={blog.title} content={blog.content} publishedDate={blog.publishedDate} />
+        <div>
+            <FullBlog title={blog.title} content={blog.content} publishedDate={publishedDate} id={id} clicked={clicked} setClicked={setClicked} liked={liked} setLiked={setLiked} />
         </div>
         <UserDescription authorName={authorName} />
     </div>
@@ -33,14 +51,41 @@ interface BlogsCardInput {
     title: string;
     content: string;
     publishedDate: string;
+    liked : number,
+    setLiked : (value:number)=> void,
+    clicked : boolean,
+    setClicked : (value : boolean) => void
 }
-function FullBlog({ title, content, publishedDate }: BlogsCardInput) {
+function FullBlog({ id, title, content, publishedDate ,liked , setLiked , clicked,setClicked}: BlogsCardInput) {
+    async function handleClick() {
+        if (clicked) {
+            await axios.patch(`${BACKEND_URL}api/v1/blog/like/${id}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setLiked(liked - 1);
+            setClicked(false);
+
+        } else {
+            await axios.patch(`${BACKEND_URL}api/v1/blog/like/${id}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setLiked(liked + 1);
+            setClicked(true);
+        }
+    };
+
+
     return <div className=" w-full p-4 flex flex-col gap-4  ">
         <div className="text-5xl w-[80%] cursor-pointer leading-15 font-semibold">{title}  </div>
         <div className="text-neutral-500 ">{`Posted on ${publishedDate}`}</div>
         <div className="text-2xl text-neutral-600 cursor-pointer tracking-wide leading-8">{content}</div>
         <div className="flex gap-4 items-center w-full ">
-            <div className="flex gap-2 text-neutral-600 font-black cursor-pointer "><img className="" src={like} height={15} width={25} />10 likes</div>
+            <div className={`flex gap-2 font-black cursor-pointer ${clicked ? "text-gray-400 cursor-not-allowed" : "text-neutral-600"
+                }`} onClick={handleClick}  ><img className="" src={like} height={15} width={25} />{liked} likes</div>
         </div>
     </div>
 }
