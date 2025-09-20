@@ -34,13 +34,14 @@ export const BlogsDetail = () => {
             </div>
         );
     }
-    const authorName = blog.user.fname + " " + blog.user.lname;
+    const authorName =blog.user? blog.user.fname + " " + blog.user.lname : "Anonymous";
     const publishedDate = formatDate(blog.createdAt)
-    return <div className="flex mt-35 justify-center w-[80%] gap-8 ">
-        <div className="overflow-hidden h-[60%]  overflow-y-scroll [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mask-y-from-90%">
+    const userId = blog.user? blog.user.id : "";
+    return <div className="flex mt-35 justify-center gap-8 w-[80%] h-[750px] ">
+        <div className="overflow-hidden overflow-y-scroll [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mask-y-from-90% ">
             <FullBlog title={blog.title} content={blog.content} publishedDate={publishedDate} id={id} clicked={clicked} setClicked={setClicked} liked={liked} setLiked={setLiked} />
         </div>
-        <UserDescription authorName={authorName} />
+        <UserDescription authorName={authorName} userId={userId}/>
     </div>
 }
 
@@ -77,23 +78,22 @@ function FullBlog({ id, title, content, publishedDate ,liked , setLiked , clicke
             setClicked(true);
         }
     };
-
-
-    return <div className=" w-full p-4 py-10 flex flex-col gap-4 ">
+    return <div className=" w-full p-4 py-10 flex flex-col gap-4">
         <div className="text-5xl w-[80%] cursor-pointer leading-15 font-semibold">{title}  </div>
         <div className="text-neutral-500 ">{`Posted on ${publishedDate}`}</div>
         <div className="text-2xl text-neutral-600 cursor-pointer tracking-wide leading-8">{content}</div>
-        <div className="flex gap-4 items-center w-full ">
+        <div className="flex gap-4 items-center w-full">
             <div className={`flex gap-2 font-black cursor-pointer ${clicked ? "text-gray-400 cursor-not-allowed" : "text-neutral-600"
                 }`} onClick={handleClick}  ><img className="" src={like} height={15} width={25} />{liked} likes</div>
         </div>
     </div>
 }
 
-function UserDescription({ authorName }: { authorName: string }) {
+function UserDescription({ authorName ,userId}: { authorName: string ,userId : string}) {
+    const navigate = useNavigate();
     return <div className="min-w-[30%] p-4 ">
         <div className="text-3xl font-semibold text-neutral-600 mb-8">Author</div>
-        <div className="flex gap-6 justify-center items-center">
+        <div className="flex gap-6 justify-center items-center cursor-pointer" onClick={()=>{navigate(`/profile/${userId}`)}}>
             <div className="rounded-full w-12 h-12 border-[1px] border-gray-400  text-neutral-500 flex justify-center items-center text-2xl font-semibold shrink-0">
                 {authorName.slice(0, 1).toLocaleUpperCase()}
             </div>
