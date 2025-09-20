@@ -1,5 +1,5 @@
 import './App.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes ,Navigate} from 'react-router-dom'
 import { Signup } from './pages/Signup'
 import { Signin } from './pages/Signin'
 import { Blogs } from './pages/Blogs'
@@ -12,6 +12,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Navigate to="/sign-up" replace />} />
           <Route element={<Signup />} path='sign-up' />
           <Route element={<Signin />} path='sign-in' />
           <Route path='blogs' >
