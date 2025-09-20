@@ -13,6 +13,7 @@
     "@adin.dev/common": "^2.0.0",
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
+    "jwt-decode": "^4.0.0",
     "motion": "^12.23.12",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

@@ -19,7 +19,7 @@ function App() {
             <Route path=':id' element={<ViewBlogs />} />
           </Route>
           <Route path='profile'>
-            <Route index element={<Profile />} />
+            <Route path=':id' element={<Profile />} />
             <Route path='publish' element={<Publish />} />
           </Route>
         </Routes>
