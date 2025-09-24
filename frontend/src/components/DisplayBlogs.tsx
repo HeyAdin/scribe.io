@@ -25,13 +25,16 @@ export const DisplayBlogs = () => {
             return <BlogsCard key={i} authorName={authorName} title={b.title} content={b.content} publishedDate={publishedDate} id={b.id} likeCount={likeCount} />
         }
         )}
-        <div
+        {blogs.length == 0 ? <div
+            className="flex justify-center font-semibold text-gray-600 cursor-pointer mt-10">
+            No one has written any blog yet. Be the first one to write a blog!
+        </div> :<div
             onClick={() => {
 
             }}
-            className="flex justify-center font-semibold text-gray-600 cursor-pointer">
+            className="flex justify-center font-semibold text-gray-600 cursor-pointer mt-10">
             Load More...
-        </div>
+        </div>}
     </div>
 }
 interface BlogsCardInput {
