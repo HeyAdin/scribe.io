@@ -184,7 +184,7 @@ blog.get('/profile/:id', async (context) => {
     try {
         const prisma = context.get("prisma");
         const userId = context.req.param("id");
-        console.log(userId);
+        // console.log(userId);
         const getBlog = await prisma.blog.findMany({
             where: {
                 userId
@@ -198,25 +198,38 @@ blog.get('/profile/:id', async (context) => {
                         blogLikes: true
                     }
                 },
-                user:{
+                user: {
                     select: {
                         fname: true,
                         lname: true,
-                        email : true
+                        email: true
                     }
                 }
             }
         });
-        console.log(getBlog)
+        console.log(getBlog.length)
         if (getBlog.length == 0) {
-            const error = new Error("no blog found with this id");
+            const userId = context.get("userId");
+            console.log(userId)
+            const getUser = await prisma.user.findUnique({
+                where: {
+                    id :userId,
+                },
+                select: {
+                    fname: true,
+                    lname: true,
+                    email: true
+                }
+            })
+            console.log(getUser);
+            const error: any = new Error("no blog found with this id");
+            error.data = getUser;
             throw error;
         }
         return context.json({ success: true, msg: "your blog", data: getBlog });
     }
     catch (e: any) {
-        if (e instanceof Error) { return context.json({ success: false, msg: e.message }); }
-        return context.json({ success: false, msg: "unknow error occured" });
+        return context.json({ success: false, msg: e.message, data: [{user:e.data}] });
     }
 })
 

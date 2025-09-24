@@ -5,8 +5,8 @@ import { BACKEND_URL } from "../../config";
 type user = {
     fname: string;
     lname: string;
-    email? :string;
-    id : string
+    email?: string;
+    id: string
 }
 export interface BlogsType {
     id: string;
@@ -64,7 +64,7 @@ export const useBlogDetail = ({ id }: { id: string }) => {
         id: "",
         title: "",
         content: "",
-        user: { fname: "", lname: "" , id:""},
+        user: { fname: "", lname: "", id: "" },
         createdAt: "",
         _count: { blogLikes: 0 }
     });
@@ -108,11 +108,18 @@ export const useBlogDetail = ({ id }: { id: string }) => {
     }
 }
 
+export type userBlogsData = {
+    success: boolean;
+    msg: string,
+    data?: BlogsType[] | {users: { fname: string, lname: string, email: string }} 
+}
+
 export const useUserBlog = ({ id }: { id: string }) => {
-    const [blogs, setBlogs] = useState<BlogsType[]>([]);
+    const [blogs, setBlogs] = useState<userBlogsData>({ success: false, msg: '' });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    console.log(blogs)
     useEffect(() => {
         const getToken = localStorage.getItem("token");
         if (!getToken) {
@@ -131,7 +138,7 @@ export const useUserBlog = ({ id }: { id: string }) => {
             },
         })
             .then((response) => {
-                setBlogs(response.data.data)
+                setBlogs(response.data)
                 setLoading(false);
             })
             .catch(() => {
