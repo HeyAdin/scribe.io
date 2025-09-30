@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@layer utilities {
+  @keyframes border-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .wrapper-class {
+    @apply relative bg-gradient-to-b from-neutral-200 to-neutral-200 rounded-2xl overflow-hidden;
+  }
+
+  .wrapper-class::before {
+    background: conic-gradient(rgba(248, 0, 0, 0.4) 0deg,
+        rgba(61, 61, 61, 0.671) 0deg,
+        transparent 80deg);
+    @apply absolute h-[200%] w-[250%] left-[-75%] top-[-80%] content-[''];
+    animation: border-spin 7s linear infinite;
+  }
+  .content-class{
+    @apply absolute h-[calc(100%-5px)] w-[calc(100%-5px)] top-[3px] left-[3px]  rounded-2xl 
+  }
+}
+
+.background {
+  --color: #f2f3f2;
+  /* height: 100%; */
+  background-color: #e9e0d4;
+  background-image: linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 25%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
+  background-size: 15px 15px;
+}
