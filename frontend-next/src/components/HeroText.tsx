@@ -6,6 +6,8 @@ import { useState } from "react";
 import { BACKEND_URL } from '@/config'
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+
 export const HeroText = ({ type, heroTitle }: { type: "signin" | "signup", heroTitle: string }) => {
   const [error, setError] = useState("");
   const router = useRouter();
@@ -27,7 +29,7 @@ export const HeroText = ({ type, heroTitle }: { type: "signin" | "signup", heroT
         return;
       }
       setError("");
-      localStorage.setItem("token", data.token);
+      Cookies.set("token", data.token);
       router.push('/blogs');
     }
     catch (e: any) {
@@ -36,7 +38,7 @@ export const HeroText = ({ type, heroTitle }: { type: "signin" | "signup", heroT
     }
   }
   return <div
-    className=" md:w-[50%] flex justify-center items-center">
+    className="md:w-[50%] flex justify-center items-center">
     <div className="w-[75%] flex flex-col items-center">
       <div
         className=" w-full text-center mb-10">

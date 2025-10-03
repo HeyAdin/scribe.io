@@ -2,15 +2,16 @@
 import { motion } from "motion/react"
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
 export const Navbar = () => {
   const router = useRouter();
-  let id: string;
-  const token = localStorage.getItem("token");
+  let id: string = "";
+  const token = Cookies.get("token");
   if (!token) {
     router.push("/signin");
   }
   else {
-    const decoded: { id: string, iat: number } = jwtDecode(localStorage.getItem("token") || "") || "";
+    const decoded: { id: string, iat: number } = jwtDecode(Cookies.get("token") || "");
     id = decoded.id;
   }
   return <div className="w-[80%] flex justify-between items-center fixed z-10">
@@ -24,7 +25,7 @@ export const Navbar = () => {
           className='group-hover:flex flex-col hidden absolute w-[70px] '>
           <div className='hover:border-b  hover:text-neutral-500' onClick={() => { router.push("/blogs") }}>Settings</div>
           <div className='hover:border-b  hover:text-neutral-500' onClick={() => {
-            localStorage.removeItem("token");
+            Cookies.remove("token");
             router.push("/signin")
           }}>Sign out</div>
         </motion.div>
