@@ -190,6 +190,7 @@ blog.get('/profile/:id', async (context) => {
                 userId
             },
             select: {
+                id : true,
                 title: true,
                 content: true,
                 createdAt: true,

@@ -31,8 +31,7 @@ export const HeroText = ({ type, heroTitle }: { type: "signin" | "signup", heroT
             navigate('/blogs');
         }
         catch (e: any) {
-            setError(e);
-            alert(error);
+            console.log(e.message);
         }
     }
     return <div
