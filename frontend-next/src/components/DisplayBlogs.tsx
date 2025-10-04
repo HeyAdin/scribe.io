@@ -1,12 +1,12 @@
 'use client'
-import { useBlogs } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { BlogCardSkeleton } from "./BlogCardSkeleton";
 import { formatDate } from "@/config";
+import { useGetBlogsDataQuery } from "@/redux/services/blogServices";
+import { toast } from "sonner";
 export const DisplayBlogs = () => {
-  const { blogs, loading, error } = useBlogs();
-  console.log(loading);
-  if (loading) {
+  const { data, error, isLoading, isFetching } = useGetBlogsDataQuery("");
+  if (isLoading) {
     return <div className="mt-10">
       <BlogCardSkeleton />
       <BlogCardSkeleton />
@@ -15,17 +15,18 @@ export const DisplayBlogs = () => {
   }
   if (error) {
     console.log("error got ")
-    return <div className="text-2xl font-bold text-red-600">{error}</div>
+    toast.error("got Error in api.")
+    // return <div className="text-2xl font-bold text-red-600">{error}</div>
   }
   return <div className="mb-15">
-    {blogs.map((b, i) => {
+    {data?.data.map((b, i) => {
       const publishedDate = formatDate(b.createdAt)
       const authorName = b.user ? `${b.user.fname} ${b.user.lname}` : "Unknown Author";
       const likeCount = b._count.blogLikes;
       return <BlogsCard key={i} authorName={authorName} title={b.title} content={b.content} publishedDate={publishedDate} id={b.id} likeCount={likeCount} />
     }
     )}
-    {blogs.length == 0 ? <div
+    {data?.data.length == 0 ? <div
       className="flex justify-center font-semibold text-gray-600 cursor-pointer mt-10">
       No one has written any blog yet. Be the first one to write a blog!
     </div> : <div

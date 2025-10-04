@@ -1,19 +1,22 @@
 'use client'
 import { motion } from "motion/react"
-import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation';
-import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { removeAuthTokenCookies } from "@/redux/features/authTokenSlice";
+import { RootState } from "@/redux/store";
+import { useEffect } from "react";
+import { setAuthState } from "@/redux/features/authTokenSlice";
+
+
 export const Navbar = () => {
   const router = useRouter();
-  let id: string = "";
-  const token = Cookies.get("token");
-  if (!token) {
-    router.push("/signin");
-  }
-  else {
-    const decoded: { id: string, iat: number } = jwtDecode(Cookies.get("token") || "");
-    id = decoded.id;
-  }
+  const dispatch = useDispatch();
+  const id = useSelector((state: RootState) => state.auth.AuthData.id);
+
+  useEffect(() => {
+    dispatch(setAuthState());
+  }, [])
+
   return <div className="w-[80%] flex justify-between items-center fixed z-10">
     <img onClick={() => router.push('/blogs')} src={'/images/logo.png'} width={"100"} height={"100"} className=" h-auto cursor-pointer" />
     <div className='flex list-none gap-5 text-lg text-neutral-700 font-semibold'>
@@ -25,11 +28,11 @@ export const Navbar = () => {
           className='group-hover:flex flex-col hidden absolute w-[70px] '>
           <div className='hover:border-b  hover:text-neutral-500' onClick={() => { router.push("/blogs") }}>Settings</div>
           <div className='hover:border-b  hover:text-neutral-500' onClick={() => {
-            Cookies.remove("token");
-            router.push("/signin")
+            dispatch(removeAuthTokenCookies());
+            router.push("/signin");
           }}>Sign out</div>
         </motion.div>
       </li>
     </div>
-  </div>
+  </div >
 }

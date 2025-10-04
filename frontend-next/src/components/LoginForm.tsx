@@ -42,13 +42,12 @@ export const NewLoginForm = ({ type, heroTitle }: { type: "signin" | "signup", h
       // const oneHourFromNow = new Date(new Date().getTime() + 60 * 60 * 1000);
       // Cookies.set("token", successData.token, { secure: true, expires: oneHourFromNow, path: "/" });
       dispatch(setAuthTokenCookies({ token: successData.token }));
+      toast.success("success");
+      router.push("/blogs")
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message || "Error with the api.")
       }
-    } finally {
-      toast.success("success");
-      router.push("/blogs")
     }
   }
   return <div className="md:w-[50%] flex justify-center items-center">

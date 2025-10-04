@@ -21,50 +21,6 @@ export interface BlogsType {
   createdAt: string;
   _count: { blogLikes: number }
 }
-export const useBlogs = () => {
-  const [blogs, setBlogs] = useState<BlogsType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  useEffect(() => {
-    const getToken = Cookies.get("token");
-    console.log('token fetching in progress.')
-    console.log(getToken)
-
-    if (!getToken) {
-      setError("You are not authorized");
-      toast.error("You are not authorized.")
-      const timer = setTimeout(() => {
-        router.push("/signin");
-      }, 700);
-
-      return () => clearTimeout(timer);
-    }
-
-    const token = `Bearer ${getToken}`;
-
-    axios
-      .get(`${BACKEND_URL}api/v1/blog`, {
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then((response) => {
-        setBlogs(response.data.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        router.push("/signin");
-      });
-  }, [router]);
-
-  return {
-    blogs,
-    loading,
-    error
-  }
-}
-
 
 export const useBlogDetail = ({ id }: { id: string }) => {
 
