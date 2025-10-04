@@ -4,6 +4,7 @@ import { useBlogDetail } from "../hooks"
 import { BACKEND_URL, formatDate } from "@/config";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export const BlogsDetail = () => {
   const [clicked, setClicked] = useState(false);
@@ -13,7 +14,7 @@ export const BlogsDetail = () => {
   useEffect(() => {
     axios.get(`${BACKEND_URL}api/v1/blog/like/${params.blogs_id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`
+        Authorization: `Bearer ${Cookies.get("token")}`
       }
     })
       .then((response) => {
@@ -66,7 +67,7 @@ function FullBlog({ id, title, content, publishedDate, liked, setLiked, clicked,
     if (clicked) {
       await axios.patch(`${BACKEND_URL}api/v1/blog/like/${id}`, {}, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${Cookies.get("token")}`
         }
       })
       setLiked(liked - 1);
@@ -75,7 +76,7 @@ function FullBlog({ id, title, content, publishedDate, liked, setLiked, clicked,
     } else {
       await axios.patch(`${BACKEND_URL}api/v1/blog/like/${id}`, {}, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${Cookies.get("token")}`
         }
       })
       setLiked(liked + 1);

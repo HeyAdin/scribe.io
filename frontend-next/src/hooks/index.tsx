@@ -4,6 +4,9 @@ import { useEffect, useState } from "react"
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { BACKEND_URL } from "@/config";
+import Cookies from "js-cookie";
+import { toast } from "sonner";
+
 type user = {
   fname: string;
   lname: string;
@@ -18,47 +21,6 @@ export interface BlogsType {
   createdAt: string;
   _count: { blogLikes: number }
 }
-export const useBlogs = () => {
-  const [blogs, setBlogs] = useState<BlogsType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  useEffect(() => {
-    const getToken = localStorage.getItem("token");
-
-    if (!getToken) {
-      setError("You are not authorized");
-      const timer = setTimeout(() => {
-        router.push("/signin");
-      }, 700);
-
-      return () => clearTimeout(timer);
-    }
-
-    const token = `Bearer ${getToken}`;
-
-    axios
-      .get(`${BACKEND_URL}api/v1/blog`, {
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then((response) => {
-        setBlogs(response.data.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        router.push("/sign-in");
-      });
-  }, [router]);
-
-  return {
-    blogs,
-    loading,
-    error
-  }
-}
-
 
 export const useBlogDetail = ({ id }: { id: string }) => {
 
@@ -74,12 +36,12 @@ export const useBlogDetail = ({ id }: { id: string }) => {
   const [error, setError] = useState("");
   const router = useRouter();
   useEffect(() => {
-    const getToken = localStorage.getItem("token");
+    const getToken = Cookies.get("token");
     if (!getToken) {
       setError("You are not authorized");
       const timer = setTimeout(() => {
-        router.push("/sign-in");
-        localStorage.removeItem("token");
+        router.push("/signin");
+        Cookies.remove("token");
       }, 700);
 
       return () => clearTimeout(timer);
@@ -99,7 +61,7 @@ export const useBlogDetail = ({ id }: { id: string }) => {
         setLoading(false);
       })
       .catch(() => {
-        router.push("/sign-in");
+        router.push("/signin");
       });
   }, [router]);
 
@@ -123,7 +85,7 @@ export const useUserBlog = ({ id }: { id: string }) => {
   const router = useRouter();
   console.log(blogs)
   useEffect(() => {
-    const getToken = localStorage.getItem("token");
+    const getToken = Cookies.get("token");
     if (!getToken) {
       setError("You are not authorized");
       const timer = setTimeout(() => {

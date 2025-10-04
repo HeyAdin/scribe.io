@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar"
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
+import Cookies from "js-cookie";
 
 const Publish = () => {
   return <div className="background h-screen">
@@ -33,7 +34,7 @@ function CreatBlog() {
       axios.post(`${BACKEND_URL}api/v1/blog`, { title, content },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${Cookies.get("token")}`
           }
         }
       ).then((response) => {
